@@ -100,13 +100,17 @@ add_subdirectory(src)
 ##########################
 # pybind11 interface
 ##########################
-add_subdirectory(${PROJECT_SOURCE_DIR}/3rd/pybind11)
-add_subdirectory(interface)
-
+set(BUILD_INTERFACE ON CACHE BOOL "Build Pybind Interface")
+if(BUILD_INTERFACE)
+  add_subdirectory(${PROJECT_SOURCE_DIR}/3rd/pybind11)
+  add_subdirectory(interface)
+endif()
 
 ##########################
 # examples
 ##########################
-set(USE_SOCKET_PUBLISHER ON CACHE BOOL "Enable Socket Publisher")
-set(USE_PANGOLIN_VIEWER OFF CACHE BOOL "Enable Pangolin Publisher")
+set(BUILD_EXAMPLES ON CACHE BOOL "Build examples")
+if(BUILD_EXAMPLES)
+  set(USE_SOCKET_PUBLISHER ON CACHE BOOL "Enable Socket Publisher")
+  set(USE_PANGOLIN_VIEWER OFF CACHE BOOL "Enable Pangolin Publisher")
 add_subdirectory(examples)
