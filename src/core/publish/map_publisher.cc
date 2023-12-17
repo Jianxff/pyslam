@@ -73,6 +73,10 @@ namespace PLSLAM
             return map_db_->get_num_landmarks();
         }
 
+        std::vector<data::landmark*> map_publisher::get_all_landmarks() {
+            return map_db_->get_all_landmarks();
+        }
+
         unsigned int map_publisher::get_landmark_lines(std::vector<data::Line *> &all_landmark_lines)
         {
             all_landmark_lines = map_db_->get_all_landmarks_line();

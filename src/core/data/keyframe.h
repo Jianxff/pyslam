@@ -366,6 +366,7 @@ namespace PLSLAM
 
                      void set_img_rgb(const cv::Mat &img_rgb);
                      cv::Mat get_img_rgb() const;
+                     cv::Vec3b get_color(const cv::KeyPoint&);
 
                      //-----------------------------------------
                      // FW: for line tracking

@@ -432,6 +432,10 @@ namespace PLSLAM
             lm->compute_descriptor();
             lm->update_normal_and_depth();
 
+            // !NEW set rgb color
+            const auto kp = cur_keyfrm->undist_keypts_.at(idx_1);
+            lm->color_ = cur_keyfrm->get_color(kp);
+            
             map_db_->add_landmark(lm);
             // wait for redundancy check
 #ifdef USE_OPENMP

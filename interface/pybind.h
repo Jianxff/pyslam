@@ -22,7 +22,11 @@
 
 #include "scene_mvs.h"
 
-#include "data_serializer.h"
+#include "pcl_serializer.h"
+
+#ifdef VISUAL_DEBUG
+#include "pangolin_viewer/viewer.h"
+#endif
 
 namespace py = pybind11;
 
@@ -83,6 +87,7 @@ public:
   std::shared_ptr<PLSLAM::config> instance();
 
 protected:
+  std::shared_ptr<PLSLAM::config> pconfig_ = nullptr;
   YAML::Node yaml_node_;
   std::string config_file_path_;
 };
@@ -130,9 +135,15 @@ private:
   std::shared_ptr<PLSLAM::system> psystem_ = nullptr;
   std::shared_ptr<ImageStream> pstream_ = nullptr;
   std::shared_ptr<MVS::Scene> pmvs_ = nullptr;
-  std::unique_ptr<data_serializer> pserializer_ = nullptr;
+  std::unique_ptr<pcl_serializer> pserializer_ = nullptr;
 
   std::thread system_thread_;
+
+#ifdef VISUAL_DEBUG
+  std::unique_ptr<pangolin_viewer::viewer> pviewer_ = nullptr;
+  std::thread viewer_thread_;
+#endif
+
 };
 
 

@@ -938,12 +938,19 @@ namespace PLSLAM
 
         void keyframe::set_img_rgb(const cv::Mat &img_rgb)
         {
-            _img_rgb = img_rgb;
+            _img_rgb = img_rgb.clone();
         }
 
         cv::Mat keyframe::get_img_rgb() const
         {
             return _img_rgb;
+        }
+
+        cv::Vec3b keyframe::get_color(const cv::KeyPoint& kp) {
+            if(_img_rgb.empty() || _img_rgb.channels() != 3) {
+                return cv::Vec3b(0,0,0);
+            }
+            return _img_rgb.at<cv::Vec3b>(kp.pt.y, kp.pt.x);
         }
 
         // FW:

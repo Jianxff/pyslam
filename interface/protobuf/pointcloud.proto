@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message pointcloud {
+
+    message point {
+        uint32 id = 1;
+        repeated double xyz = 2;
+        repeated uint32 rgb = 3;
+    }
+
+    repeated point points = 2;
+}

@@ -23,7 +23,7 @@ Camera.fps: 60.0
 Camera.cols: 752
 Camera.rows: 480
 
-Camera.color_order: "Gray"
+Camera.color_order: "RGB"
 
 #================#
 # ORB Parameters #

@@ -121,9 +121,13 @@ Config& Config::Serialize(const std::string& map, const std::string& scene, cons
 }
 
 std::shared_ptr<PLSLAM::config> Config::instance() {
-  return std::make_shared<PLSLAM::config>(
-    yaml_node_, config_file_path_
-  );
+  if(pconfig_ != nullptr) return pconfig_;
+  else {
+    pconfig_ = std::make_shared<PLSLAM::config>(
+      yaml_node_, config_file_path_
+    );
+    return pconfig_;
+  }
 }
 
 
@@ -152,10 +156,15 @@ Session::Session(const Config& cfg)
   else psystem_->disable_mapping_module();
 
   // serialize
-  pserializer_.reset(new data_serializer(psystem_->map_publisher_));
+  pserializer_.reset(new pcl_serializer(psystem_->map_publisher_));
 
   // run thread
   system_thread_ = std::thread(&Session::run, this);
+
+#ifdef VISUAL_DEBUG
+  pviewer_.reset(new pangolin_viewer::viewer(cfg_.instance(), psystem_.get(), psystem_->get_frame_publisher(), psystem_->get_map_publisher()));
+  viewer_thread_ = std::thread(&pangolin_viewer::viewer::run, pviewer_.get());
+#endif
 }
 
 // add track image
@@ -245,7 +254,11 @@ py::array_t<size_t> Session::release() {
   pstream_->release();
   
   exit_required_ = true;
-  
+
+#ifdef VISUAL_DEBUG
+  pviewer_->request_terminate();
+  viewer_thread_.join();
+#endif
 
   psystem_->shutdown();
   system_thread_.join();

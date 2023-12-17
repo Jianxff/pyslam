@@ -92,6 +92,8 @@ namespace PLSLAM
             unsigned int get_landmarks(std::vector<data::landmark *> &all_landmarks,
                                        std::set<data::landmark *> &local_landmarks);
 
+            std::vector<data::landmark*> get_all_landmarks();
+
             // FW: get all the landmark lines
             unsigned int get_landmark_lines(std::vector<data::Line *> &all_landmark_lines);
             bool using_line_tracking() const;

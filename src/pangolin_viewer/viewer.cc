@@ -166,6 +166,9 @@ namespace pangolin_viewer
 
         system_->request_terminate();
 
+        pangolin::DestroyWindow(map_viewer_name_);
+        cv::destroyAllWindows();
+
         terminate();
     }
 

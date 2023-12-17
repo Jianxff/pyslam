@@ -153,6 +153,8 @@ namespace PLSLAM
             Vec3_t pos_w_after_global_BA_;
             unsigned int loop_BA_identifier_ = 0;
 
+            cv::Vec3b color_ = cv::Vec3b(0, 0, 0);
+
         private:
             //! world coordinates of this landmark
             Vec3_t pos_w_;

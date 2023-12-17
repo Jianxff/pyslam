@@ -6,13 +6,10 @@ add_subdirectory(core)
 ##########################
 # socket publisher
 ##########################
-if(USE_SOCKET_PUBLISHER)
-  add_subdirectory(socket_publisher)
-endif()
+add_subdirectory(socket_publisher)
+
 
 ##########################
 # pangolin viewer
 ##########################
-if(USE_PANGOLIN_VIEWER)
-  add_subdirectory(pangolin_viewer)
-endif()
+add_subdirectory(pangolin_viewer)
