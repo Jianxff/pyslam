@@ -136,7 +136,7 @@ namespace PLSLAM
                      const optimize::transform_optimizer transform_optimizer_;
 
                      //! flag which indicates the loop detector is enabled or not
-                     std::atomic<bool> loop_detector_is_enabled_{true};
+                     std::atomic<bool> loop_detector_is_enabled_{false};
 
                      //! for stereo/RGBD models, fix scale when estimating Sim3
                      const bool fix_scale_in_Sim3_estimation_;

@@ -71,6 +71,10 @@ public:
   Config& Mapping(bool flag = true);
   bool mapping_ = true;
 
+  // enable loopdetect
+  Config& LoopDetect(bool flag = true);
+  bool loop_detect_ = false;
+
   // load map database
   Config& Database(const std::string& map);
   bool preload = false;
@@ -159,6 +163,7 @@ PYBIND11_MODULE(pysfm, m) {
     .def("model", &Config::Model, py::arg("imwidth"), py::arg("imheight"))
     .def("line_track", &Config::LineTrack, py::arg("flag") = true)
     .def("mapping", &Config::Mapping, py::arg("flag") = true)
+    .def("loop_detect", &Config::LoopDetect, py::arg("flag") = true)
     .def("database", &Config::Database, py::arg("map"))
     .def("serialize", &Config::Serialize, py::arg("map"), py::arg("scene"), py::arg("raw_img"))
     .def("visualize", &Config::BackView, py::arg("flag") = true);

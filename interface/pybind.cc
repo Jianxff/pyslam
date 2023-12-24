@@ -23,6 +23,11 @@ void ImageStream::addNewImage(cv::Mat& im, double time_ms) {
   if(released_) return;
 
   std::lock_guard<std::mutex> lock(img_mutex_);
+  if(img_stream_.size() > 300) {
+    spdlog::warn("ImageStream: drop previous frame after 300 frames freezed");
+    img_stream_.pop();
+    img_times_.pop();
+  }
   img_stream_.push(im);
   img_times_.push(time_ms);
 
@@ -104,6 +109,10 @@ Config& Config::Mapping(bool flag) {
   return *this;
 }
 
+Config& Config::LoopDetect(bool flag) {
+  loop_detect_ = flag;
+  return *this;
+}
 
 Config& Config::Database(const std::string& map) {
   preload = true;
@@ -160,6 +169,8 @@ Session::Session(const Config& cfg)
   // preload
   if(cfg_.preload)
     psystem_->load_map_database(cfg.map_db_path_);
+  if(cfg_.loop_detect_)
+    psystem_->enable_loop_detector();
   // start session
   psystem_->startup(!cfg.preload);
 
