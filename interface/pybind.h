@@ -24,7 +24,7 @@
 
 #include "pcl_serializer.h"
 
-#ifdef VISUAL_DEBUG
+#ifdef WITH_PANGOLIN_VIEWER
 #include "pangolin_viewer/viewer.h"
 #endif
 
@@ -76,6 +76,9 @@ public:
   bool preload = false;
   std::string map_db_path_ = "";
 
+  Config& BackView(bool flag = true);
+  bool backview_ = false;
+
   // serialize for scene generation
   Config& Serialize(const std::string& map, const std::string& scene, const std::string& raw_img);
   bool serialize_ = false;
@@ -122,7 +125,7 @@ private:
   // run thread
   void run();
   // get image from webrtc frame
-  cv::Mat getImageBGR(py::array_t<uint8_t>& input);
+  cv::Mat getImageRGB(py::array_t<uint8_t>& input);
   // dump image
   void dumpImages();
 
@@ -139,7 +142,7 @@ private:
 
   std::thread system_thread_;
 
-#ifdef VISUAL_DEBUG
+#ifdef WITH_PANGOLIN_VIEWER
   std::unique_ptr<pangolin_viewer::viewer> pviewer_ = nullptr;
   std::thread viewer_thread_;
 #endif
@@ -157,7 +160,8 @@ PYBIND11_MODULE(pysfm, m) {
     .def("line_track", &Config::LineTrack, py::arg("flag") = true)
     .def("mapping", &Config::Mapping, py::arg("flag") = true)
     .def("database", &Config::Database, py::arg("map"))
-    .def("serialize", &Config::Serialize, py::arg("map"), py::arg("scene"), py::arg("raw_img"));
+    .def("serialize", &Config::Serialize, py::arg("map"), py::arg("scene"), py::arg("raw_img"))
+    .def("visualize", &Config::BackView, py::arg("flag") = true);
 
   py::class_<Session>(m, "Session")
     .def(py::init<Config>(), py::arg("config"))

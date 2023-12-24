@@ -1,7 +1,5 @@
 # ----- Find dependencies -----
 
-set(USE_STACK_TRACE_LOGGER OFF CACHE BOOL "Enable automatic stack trace logger of google-glog")
-
 if(USE_STACK_TRACE_LOGGER)
     find_package(Glog REQUIRED)
     include_directories(${GLOG_INCLUDE_DIR})

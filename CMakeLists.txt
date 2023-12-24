@@ -9,7 +9,7 @@ cmake_policy(SET CMP0079 NEW)
 ##########################
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Debug")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -96,14 +96,27 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 add_subdirectory(src)
 
+##########################
+# extend library
+##########################
+set(BUILD_SOCKET_PUBLISHER OFF CACHE BOOL "Enable Socket Publisher")
+set(BUILD_PANGOLIN_VIEWER ON CACHE BOOL "Enable Pangolin Publisher")
+
 
 ##########################
 # pybind11 interface
 ##########################
 set(BUILD_INTERFACE ON CACHE BOOL "Build Pybind Interface")
-set(INTERFACE_DEBUG ON CACHE BOOL "Enable Interface Visual DEBUG")
 if(BUILD_INTERFACE)
   message(STATUS "Build Pybind Interface")
+
+  set(INTERFACE_OUTPUT_DIRECTORY ${INTERFACE_OUTPUT})
+  if(NOT INTERFACE_OUTPUT_DIRECTORY)
+    set(INTERFACE_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  endif()
+  
+  message(STATUS "Interface output directory: ${INTERFACE_OUTPUT_DIRECTORY}")
+
   add_subdirectory(${PROJECT_SOURCE_DIR}/3rd/pybind11)
   add_subdirectory(interface)
 endif()
@@ -111,10 +124,12 @@ endif()
 ##########################
 # examples
 ##########################
-set(BUILD_EXAMPLES ON CACHE BOOL "Build examples")
+set(BUILD_EXAMPLES OFF CACHE BOOL "Build examples")
 if(BUILD_EXAMPLES)
   message(STATUS "Build examples")
-  set(USE_SOCKET_PUBLISHER OFF CACHE BOOL "Enable Socket Publisher")
-  set(USE_PANGOLIN_VIEWER ON CACHE BOOL "Enable Pangolin Publisher")
+
+  set(USE_STACK_TRACE_LOGGER OFF CACHE BOOL "Enable automatic stack trace logger of google-glog")
+  set(USE_PANGOLIN_VIEWER OFF CACHE BOOL "Use Pangolin Viewer")
+  set(USE_SOCKET_PUBLISHER OFF CACHE BOOL "Use Socket Publisher")
   add_subdirectory(examples)
 endif()

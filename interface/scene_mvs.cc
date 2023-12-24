@@ -51,8 +51,12 @@ void Scene::bindKeyframeID() {
   auto keyframes = psystem_->map_db_->get_all_keyframes();
   uint32_t cnt = 0;
   for(auto& kf : keyframes) {
+    // check status
     if(!kf || kf->will_be_erased()) continue;
-      kfid_map_[kf->id_] = cnt++;
+    // check image
+    if(kf->get_img_rgb().empty()) continue;
+    // bind to incremental id
+    kfid_map_[kf->id_] = cnt++;
   }
 }
 
@@ -100,7 +104,11 @@ void Scene::defineImagePose(const std::string& image_dir) {
   size_t cnt = 0;
 
   for(auto& kf : keyframes) {
+    // check status
     if(!kf || kf->will_be_erased())
+      continue;
+    // check image
+    if(kf->get_img_rgb().empty())
       continue;
     
     _INTERFACE_NAMESPACE::Interface::Image image;
@@ -115,7 +123,7 @@ void Scene::defineImagePose(const std::string& image_dir) {
     image.poseID = platform.poses.size();
 
     // rotation
-    auto rcw = kf->get_rotation();
+    Eigen::Matrix3d rcw = kf->get_rotation();
     if(convert_cv2gl_) 
       rcw = rcw * MAT_X33D_CV2GL_INVERSE_;
     cv::eigen2cv(rcw, pose.R);

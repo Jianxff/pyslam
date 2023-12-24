@@ -50,10 +50,11 @@ namespace pangolin_viewer
           keyfrm_size_(cfg->yaml_node_["PangolinViewer.keyframe_size"].as<float>(0.1)),
           keyfrm_line_width_(cfg->yaml_node_["PangolinViewer.keyframe_line_width"].as<unsigned int>(1)),
           graph_line_width_(cfg->yaml_node_["PangolinViewer.graph_line_width"].as<unsigned int>(1)),
-          point_size_(cfg->yaml_node_["PangolinViewer.point_size"].as<unsigned int>(2)),
+          point_size_(cfg->yaml_node_["PangolinViewer.point_size"].as<float>(2)),
           camera_size_(cfg->yaml_node_["PangolinViewer.camera_size"].as<float>(0.15)),
           camera_line_width_(cfg->yaml_node_["PangolinViewer.camera_line_width"].as<unsigned int>(2)),
           cs_(cfg->yaml_node_["PangolinViewer.color_scheme"].as<std::string>("black")),
+          landmark_rgb_(cfg->yaml_node_["PangolinViewer.landmark_rgb"].as<bool>(false)),
           mapping_mode_(system->mapping_module_is_enabled()),
           loop_detection_mode_(system->loop_detector_is_enabled())
     {
@@ -395,7 +396,15 @@ namespace pangolin_viewer
             }
 
             glPointSize(point_size_ * *menu_lm_size_);
-            glColor3fv(cs_.lm_.data());
+
+            if(landmark_rgb_) {
+                auto color = lm->color_;
+                float colors[3] = {(float)color(0)/255, (float)color(1)/255, (float)color(2)/255};
+                glColor3fv(colors);
+            } else {
+                glColor3fv(cs_.lm_.data());
+            }
+                
 
             const PLSLAM::Vec3_t pos_w = lm->get_pos_in_world();
             glVertex3fv(pos_w.cast<float>().eval().data());
@@ -418,7 +427,14 @@ namespace pangolin_viewer
             }
 
             glPointSize(point_size_ * *menu_lm_size_);
-            glColor3fv(cs_.local_lm_.data());
+
+            if(landmark_rgb_) {
+                auto color = local_lm->color_;
+                float colors[3] = {(float)color(0)/255, (float)color(1)/255, (float)color(2)/255};
+                glColor3fv(colors);
+            } else {
+                glColor3fv(cs_.local_lm_.data());
+            }
 
             const PLSLAM::Vec3_t pos_w = local_lm->get_pos_in_world();
             glVertex3fv(pos_w.cast<float>().eval().data());

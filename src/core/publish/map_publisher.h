@@ -93,6 +93,7 @@ namespace PLSLAM
                                        std::set<data::landmark *> &local_landmarks);
 
             std::vector<data::landmark*> get_all_landmarks();
+            std::set<data::landmark *> get_local_landmarks();
 
             // FW: get all the landmark lines
             unsigned int get_landmark_lines(std::vector<data::Line *> &all_landmark_lines);

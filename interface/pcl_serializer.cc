@@ -21,6 +21,7 @@ pcl_serializer::pcl_serializer(const std::shared_ptr<PLSLAM::publish::map_publis
 std::string pcl_serializer::serialize_map_diff()
 {
     auto all_landmarks = map_publisher_->get_all_landmarks();
+
     const auto current_camera_pose = map_publisher_->get_current_cam_pose();
 
     const double pose_hash = get_mat_hash(current_camera_pose);
@@ -41,8 +42,15 @@ std::string pcl_serializer::serialize_as_protobuf(const std::vector<PLSLAM::data
     // landmark registration
     std::unordered_map<unsigned int, double> next_point_hash_map;
     for (const auto landmark : all_landmarks){
-        if (!landmark || landmark->will_be_erased())
+        if (!landmark)
             continue;
+
+        // remove bad landmarks
+        if(landmark->will_be_erased()) {
+            auto landmark_obj = map.add_points();
+            landmark_obj->set_id(landmark->id_);
+            continue;
+        }
 
         const auto id = landmark->id_;
         const auto pos = landmark->get_pos_in_world();

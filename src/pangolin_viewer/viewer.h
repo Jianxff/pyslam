@@ -184,6 +184,7 @@ namespace pangolin_viewer
         const float point_size_;
         const float camera_size_;
         const float camera_line_width_;
+        const bool landmark_rgb_;
 
         const color_scheme cs_;
 

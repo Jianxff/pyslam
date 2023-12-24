@@ -41,11 +41,11 @@ target_link_libraries(pysfm
     ${PROJECT_NAME}
 )
 
-if(INTERFACE_DEBUG)
-    message(STATUS "interface debug mode")
-    target_compile_definitions(pysfm PUBLIC VISUAL_DEBUG)
-    target_link_libraries(pysfm PUBLIC pangolin_viewer)
+if(BUILD_PANGOLIN_VIEWER)
+  target_compile_definitions(pysfm PUBLIC WITH_PANGOLIN_VIEWER)
+  target_link_libraries(pysfm PUBLIC pangolin_viewer)
 endif()
 
+set_target_properties(pysfm PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${INTERFACE_OUTPUT_DIRECTORY})
 set_target_properties(pysfm PROPERTIES OUTPUT_NAME "pysfm")
 set_target_properties(pysfm PROPERTIES SUFFIX ".so")

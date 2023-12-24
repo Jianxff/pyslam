@@ -130,6 +130,18 @@ std::shared_ptr<PLSLAM::config> Config::instance() {
   }
 }
 
+Config& Config::BackView(bool flag) {
+
+#ifdef WITH_PANGOLIN_VIEWER
+  backview_ = flag;
+#else
+  spdlog::critical("No pangolin support. Build with -DBUILD_PANGOLIN_VIEWER=ON");
+  exit(-1);
+#endif
+
+  return *this;
+}
+
 
 /************************************
  * Pybind interface for sfm session
@@ -161,9 +173,11 @@ Session::Session(const Config& cfg)
   // run thread
   system_thread_ = std::thread(&Session::run, this);
 
-#ifdef VISUAL_DEBUG
-  pviewer_.reset(new pangolin_viewer::viewer(cfg_.instance(), psystem_.get(), psystem_->get_frame_publisher(), psystem_->get_map_publisher()));
-  viewer_thread_ = std::thread(&pangolin_viewer::viewer::run, pviewer_.get());
+#ifdef WITH_PANGOLIN_VIEWER
+  if(cfg_.backview_) {
+    pviewer_.reset(new pangolin_viewer::viewer(cfg_.instance(), psystem_.get(), psystem_->get_frame_publisher(), psystem_->get_map_publisher()));
+    viewer_thread_ = std::thread(&pangolin_viewer::viewer::run, pviewer_.get());
+  }
 #endif
 }
 
@@ -171,7 +185,7 @@ Session::Session(const Config& cfg)
 void Session::addTrack(py::array_t<uint8_t>& input, double time_ms){
   if(released_) return;
 
-  cv::Mat image = getImageBGR(input).clone();
+  cv::Mat image = getImageRGB(input).clone();
   // cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
 
   if(time_ms < 0) {
@@ -202,7 +216,7 @@ py::array_t<size_t> Session::getTrackingState() {
   size_t data[3] = {0,0,0};
 
   if(!released_) {
-    data[0] = psystem_->tracker_->last_tracking_state_ + 1;
+    data[0] = psystem_->tracker_->last_tracking_state_;
     data[1] = psystem_->map_db_->get_num_keyframes();
     data[2] = psystem_->map_db_->get_num_landmarks();
   }
@@ -232,6 +246,7 @@ Eigen::Matrix4d Session::getTwcThree(){
 }
 
 std::string Session::getMapProtoBuf() {
+  if(released_) return "";
   return pserializer_->serialize_map_diff();
 }
 
@@ -241,6 +256,7 @@ void Session::dumpImages() {
   for(auto& kf : keyframes) {
     cv::Mat img = kf->get_img_rgb();
     if(img.empty()) continue;
+    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
     std::string filename = cfg_.raw_image_path_ + std::to_string(kf->id_) + ".png";
     cv::imwrite(filename, img);
   }
@@ -255,9 +271,11 @@ py::array_t<size_t> Session::release() {
   
   exit_required_ = true;
 
-#ifdef VISUAL_DEBUG
-  pviewer_->request_terminate();
-  viewer_thread_.join();
+#ifdef WITH_PANGOLIN_VIEWER
+  if(cfg_.backview_) {
+    pviewer_->request_terminate();
+    viewer_thread_.join();
+  }
 #endif
 
   psystem_->shutdown();
@@ -283,6 +301,10 @@ py::array_t<size_t> Session::release() {
   pstream_.reset();
   pmvs_.reset();
 
+#ifdef WITH_PANGOLIN_VIEWER
+  pviewer_.reset();
+#endif
+
   cv::destroyAllWindows();
 
   return py::array_t<size_t>({2}, data);
@@ -301,7 +323,8 @@ void Session::run() {
   double time;
   while( !exit_required_ ) {
     if(pstream_->getNewImage(img, time)) {
-      Twc_ = psystem_->feed_monocular_frame(img, time);
+      const Eigen::Matrix4d tcw = psystem_->feed_monocular_frame(img, time);
+      Twc_ = tcw.inverse();
     } 
     else  
       std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
@@ -310,10 +333,11 @@ void Session::run() {
 }
 
 // get image from webrtc frame
-cv::Mat Session::getImageBGR(py::array_t<uint8_t>& input) {
+cv::Mat Session::getImageRGB(py::array_t<uint8_t>& input) {
   if(input.ndim() != 3) 
     throw std::runtime_error("get Image : number of dimensions must be 3");
   py::buffer_info buf = input.request();
   cv::Mat image(buf.shape[0], buf.shape[1], CV_8UC3, (uint8_t*)buf.ptr);
+  cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
   return image;
 }

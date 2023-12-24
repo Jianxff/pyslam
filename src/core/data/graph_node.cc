@@ -25,6 +25,8 @@
 #include "core/data/graph_node.h"
 #include "core/data/landmark.h"
 
+#include <spdlog/spdlog.h>
+
 namespace PLSLAM
 {
     namespace data
@@ -360,6 +362,11 @@ namespace PLSLAM
 
                 if (max_is_found)
                 {
+                    if(max_weight_child->id_ == max_weight_parent->id_) {
+                        // cannot set parent as child
+                        spdlog::warn("cannot set parent as itself");
+                        break;
+                    }
                     // update spanning tree
                     max_weight_child->graph_node_->change_spanning_parent(max_weight_parent);
                     spanning_children_.erase(max_weight_child);
@@ -378,6 +385,13 @@ namespace PLSLAM
                 // set my parent as the new parent
                 for (const auto spanning_child : spanning_children_)
                 {
+                    if(spanning_child->id_ == spanning_parent_->id_) {
+                        // cannot set parent as child
+                        spdlog::warn("cannot set parent as itself");
+                        spanning_child->graph_node_->spanning_parent_ = nullptr;
+                        spanning_child->graph_node_->spanning_parent_is_not_set_ = true;
+                        continue;
+                    }
                     spanning_child->graph_node_->change_spanning_parent(spanning_parent_);
                 }
             }
