@@ -21,6 +21,8 @@ const Eigen::Matrix3d MAT_X33D_CV2GL_ =
 const Eigen::Matrix3d MAT_X33D_CV2GL_INVERSE_
    = MAT_X33D_CV2GL_;
 
+const unsigned int KEYFRAME_STEP_BY = 50;
+
 
 Scene::Scene(const std::shared_ptr<PLSLAM::system>& psystem) 
   : psystem_(psystem)
@@ -31,6 +33,8 @@ Scene::Scene(const std::shared_ptr<PLSLAM::system>& psystem)
 void Scene::serialize(const std::string& filename, const std::string& image_dir) {
   // set convert flag
   convert_cv2gl_ = true;
+  // filter keyframes
+  filterKeyframes();
   // bind keyframe id
   bindKeyframeID();
   // set platform
@@ -47,15 +51,37 @@ void Scene::serialize(const std::string& filename, const std::string& image_dir)
   else    spdlog::error("MVS: scene serialization failed");
 }
 
-void Scene::bindKeyframeID() {
-  auto keyframes = psystem_->map_db_->get_all_keyframes();
-  uint32_t cnt = 0;
-  for(auto& kf : keyframes) {
+void Scene::filterKeyframes() {
+  std::vector<PLSLAM::data::keyframe*> keyframes_origin, keyframes_filter;
+  keyframes_origin = psystem_->map_db_->get_all_keyframes();
+  // sort by time
+  std::sort(keyframes_origin.begin(), keyframes_origin.end(), 
+    [](const PLSLAM::data::keyframe* a, const PLSLAM::data::keyframe* b) {
+      return a->id_ < b->id_;
+    });
+  // filter
+  for(auto& kf : keyframes_origin) {
     // check status
     if(!kf || kf->will_be_erased()) continue;
     // check image
     if(kf->get_img_rgb().empty()) continue;
-    // bind to incremental id
+    
+    keyframes_filter.push_back(kf);
+  }
+
+  // downsample
+  auto kf_size = keyframes_filter.size();
+  int step = kf_size / KEYFRAME_STEP_BY;
+  step = (step == 0 ? 1 : step);
+  for(int i = 0; i < kf_size; i += step) {
+    keyframes_.push_back(keyframes_filter[i]);
+  }
+}
+
+void Scene::bindKeyframeID() {
+  // mapping
+  uint32_t cnt = 0;
+  for(auto& kf : keyframes_) {
     kfid_map_[kf->id_] = cnt++;
   }
 }
@@ -95,22 +121,14 @@ void Scene::definePlatform() {
 void Scene::defineImagePose(const std::string& image_dir) {
   auto& platform = scene_.platforms[0];
 
-  auto keyframes = psystem_->map_db_->get_all_keyframes();
-  size_t n_views = keyframes.size();
+  size_t n_views = keyframes_.size();
   
   scene_.images.reserve(n_views);
   platform.poses.reserve(n_views);
 
   size_t cnt = 0;
 
-  for(auto& kf : keyframes) {
-    // check status
-    if(!kf || kf->will_be_erased())
-      continue;
-    // check image
-    if(kf->get_img_rgb().empty())
-      continue;
-    
+  for(auto& kf : keyframes_) {
     _INTERFACE_NAMESPACE::Interface::Image image;
     // image source
     image.ID = getBindedID(kf->id_);

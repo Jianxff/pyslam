@@ -6,6 +6,7 @@
 
 #include "interface_mvs.h"
 #include "core/system.h"
+#include "core/data/keyframe.h"
 
 namespace MVS {
 
@@ -18,6 +19,9 @@ public:
   void serialize(const std::string& filename, const std::string& image_dir);
 
 protected:
+  // filter keyframes
+  void filterKeyframes();
+
   // define platforms with camera intrinsic
   void definePlatform();
 
@@ -30,6 +34,9 @@ protected:
   // map keyframe id
   void bindKeyframeID();
   uint32_t getBindedID(unsigned long kfid);
+
+  // filtered keyframes
+  std::vector<PLSLAM::data::keyframe*> keyframes_;
 
   // keyframe id maps
   std::unordered_map<unsigned long, uint32_t> kfid_map_;
