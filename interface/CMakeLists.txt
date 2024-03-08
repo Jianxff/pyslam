@@ -27,7 +27,7 @@ target_include_directories(pysfm
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/3rd/spdlog/include/
     ${PROJECT_SOURCE_DIR}/3rd/pybind11/include/
-    /usr/include/python3.8/
+    ${PYTHON_INCLUDE_DIRECTORY}
     ${PROTOBUF_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
