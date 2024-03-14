@@ -139,7 +139,7 @@ std::shared_ptr<PLSLAM::config> Config::instance() {
   }
 }
 
-Config& Config::BackView(bool flag) {
+Config& Config::Viewer(bool flag) {
 
 #ifdef WITH_PANGOLIN_VIEWER
   backview_ = flag;
@@ -156,14 +156,14 @@ Config& Config::BackView(bool flag) {
  * Pybind interface for sfm session
  ************************************/
 // constructor
-Session::Session(const Config& cfg) 
+Session::Session(const Config& cfg, bool sync) 
   : cfg_(cfg)
 {
   spdlog::set_level(spdlog::level::debug);
   
   // reset settings
   psystem_.reset(new PLSLAM::system(cfg_.instance(), cfg_.vocab_file_path_, cfg_.line_track_));
-  pstream_.reset(new ImageStream(true));
+  pstream_.reset(new ImageStream(!sync));
   pmvs_.reset(new MVS::Scene(psystem_));
 
   // preload
@@ -298,7 +298,7 @@ py::array_t<size_t> Session::release() {
     // save map
     psystem_->save_map_database(cfg_.map_path_);
     // save scene
-    dumpImages();
+    // dumpImages();
     pmvs_->serialize(cfg_.scene_path_, cfg_.raw_image_path_);
   }
 

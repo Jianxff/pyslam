@@ -80,7 +80,7 @@ public:
   bool preload = false;
   std::string map_db_path_ = "";
 
-  Config& BackView(bool flag = true);
+  Config& Viewer(bool flag = true);
   bool backview_ = false;
 
   // serialize for scene generation
@@ -103,7 +103,7 @@ protected:
 class Session {
 public:
   // constructor from config file
-  Session(const Config& cfg);
+  Session(const Config& cfg, const bool sync = false);
 
 public:
   // add new image frame
@@ -160,16 +160,16 @@ PYBIND11_MODULE(pysfm, m) {
   py::class_<Config>(m, "Config")
     .def(py::init<std::string>(), py::arg("config_file_path"))
     .def("vocab", &Config::Vocab, py::arg("path"))
-    .def("model", &Config::Model, py::arg("imwidth"), py::arg("imheight"))
+    .def("reset_model", &Config::Model, py::arg("imwidth"), py::arg("imheight"))
     .def("line_track", &Config::LineTrack, py::arg("flag") = true)
     .def("mapping", &Config::Mapping, py::arg("flag") = true)
-    .def("loop_detect", &Config::LoopDetect, py::arg("flag") = true)
-    .def("database", &Config::Database, py::arg("map"))
-    .def("serialize", &Config::Serialize, py::arg("map"), py::arg("scene"), py::arg("raw_img"))
-    .def("visualize", &Config::BackView, py::arg("flag") = true);
+    .def("loopclose", &Config::LoopDetect, py::arg("flag") = true)
+    .def("database", &Config::Database, py::arg("map_path"))
+    .def("serialize", &Config::Serialize, py::arg("map_path"), py::arg("scene_path"), py::arg("raw_img_dir"))
+    .def("visualize", &Config::Viewer, py::arg("flag") = true);
 
   py::class_<Session>(m, "Session")
-    .def(py::init<Config>(), py::arg("config"))
+    .def(py::init<Config, bool>(), py::arg("config"), py::arg("sync") = false)
     .def("add_track", &Session::addTrack, py::arg("image"), py::arg("time_ms") = -1)
     .def("tracking_state", &Session::getTrackingState)
     .def("get_feature_points", &Session::getFeaturePoints)

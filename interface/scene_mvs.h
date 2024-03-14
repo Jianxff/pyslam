@@ -22,6 +22,9 @@ protected:
   // filter keyframes
   void filterKeyframes();
 
+  // check definition
+  uint32_t getMaxDefinition(const std::vector<PLSLAM::data::keyframe*>& keyframes, uint32_t start = 0, uint32_t end = -1);
+
   // define platforms with camera intrinsic
   void definePlatform();
 

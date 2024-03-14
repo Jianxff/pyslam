@@ -51,6 +51,33 @@ void Scene::serialize(const std::string& filename, const std::string& image_dir)
   else    spdlog::error("MVS: scene serialization failed");
 }
 
+  uint32_t Scene::getMaxDefinition(const std::vector<PLSLAM::data::keyframe*>& keyframes, uint32_t start, uint32_t end) {
+    if(end == -1) {
+      end = keyframes.size();
+    }
+    uint32_t argmax = start;
+    double max_mean_value = 0;
+
+    for(auto i = start; i < end; i++) {
+      auto& kf = keyframes[i];
+      if(!kf) continue;
+      cv::Mat img = kf->get_img_rgb();
+      if(img.empty()) continue;
+      cv::Mat gray, laplacian;
+      cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
+      cv::Laplacian(gray, laplacian, CV_64F);
+      double mean_value = cv::mean(laplacian)[0];
+
+      if(mean_value > max_mean_value) {
+        max_mean_value = mean_value;
+        argmax = i;
+      }
+    }
+
+    return argmax;
+  }
+
+
 void Scene::filterKeyframes() {
   std::vector<PLSLAM::data::keyframe*> keyframes_origin, keyframes_filter;
   keyframes_origin = psystem_->map_db_->get_all_keyframes();
@@ -74,7 +101,9 @@ void Scene::filterKeyframes() {
   int step = kf_size / KEYFRAME_STEP_BY;
   step = (step == 0 ? 1 : step);
   for(int i = 0; i < kf_size; i += step) {
-    keyframes_.push_back(keyframes_filter[i]);
+    // find max definition from each step
+    const uint32_t arg = getMaxDefinition(keyframes_filter, i, i + step);
+    keyframes_.push_back(keyframes_filter[arg]);
   }
 }
 
@@ -133,6 +162,10 @@ void Scene::defineImagePose(const std::string& image_dir) {
     // image source
     image.ID = getBindedID(kf->id_);
     image.name = image_dir + std::to_string(kf->id_) + ".png";
+    cv::Mat img = kf->get_img_rgb();
+    cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
+    cv::imwrite(image.name, img);
+
     // camera
     image.platformID = 0;
     image.cameraID = 0;

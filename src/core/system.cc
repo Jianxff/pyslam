@@ -50,25 +50,25 @@ namespace PLSLAM
           camera_(cfg->camera_),
           _b_use_line_tracking(b_use_line_tracking)
     {
-        spdlog::debug("CONSTRUCT: system");
+        // spdlog::debug("CONSTRUCT: system");
 
-        std::cout << std::endl;
-        std::cout << "----------------------------------------------------------------" << std::endl;
-        std::cout << "Structure PLP-SLAM:" << std::endl;
-        std::cout << "Copyright (C) 2022, Department Augmented Vision, DFKI, Germany." << std::endl;
-        std::cout << "All rights reserved." << std::endl;
-        std::cout << std::endl;
-        std::cout << "This is free software," << std::endl;
-        std::cout << "and you are welcome to redistribute it under certain conditions." << std::endl;
-        std::cout << "See the LICENSE file." << std::endl;
-        std::cout << "----------------------------------------------------------------" << std::endl;
-        std::cout << std::endl;
+        // std::cout << std::endl;
+        // std::cout << "----------------------------------------------------------------" << std::endl;
+        // std::cout << "Structure PLP-SLAM:" << std::endl;
+        // std::cout << "Copyright (C) 2022, Department Augmented Vision, DFKI, Germany." << std::endl;
+        // std::cout << "All rights reserved." << std::endl;
+        // std::cout << std::endl;
+        // std::cout << "This is free software," << std::endl;
+        // std::cout << "and you are welcome to redistribute it under certain conditions." << std::endl;
+        // std::cout << "See the LICENSE file." << std::endl;
+        // std::cout << "----------------------------------------------------------------" << std::endl;
+        // std::cout << std::endl;
 
-        // show configuration
-        std::cout << *cfg_ << std::endl;
+        // // show configuration
+        // std::cout << *cfg_ << std::endl;
 
-        // load ORB vocabulary
-        spdlog::info("loading ORB vocabulary: {}", vocab_file_path);
+        // // load ORB vocabulary
+        // spdlog::info("loading ORB vocabulary: {}", vocab_file_path);
 
         bow_vocab_ = new fbow::Vocabulary();
         bow_vocab_->readFromFile(vocab_file_path);

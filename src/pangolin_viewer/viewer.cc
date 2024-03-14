@@ -54,9 +54,9 @@ namespace pangolin_viewer
           camera_size_(cfg->yaml_node_["PangolinViewer.camera_size"].as<float>(0.15)),
           camera_line_width_(cfg->yaml_node_["PangolinViewer.camera_line_width"].as<unsigned int>(2)),
           cs_(cfg->yaml_node_["PangolinViewer.color_scheme"].as<std::string>("black")),
-          landmark_rgb_(cfg->yaml_node_["PangolinViewer.landmark_rgb"].as<bool>(false)),
-          mapping_mode_(system->mapping_module_is_enabled()),
-          loop_detection_mode_(system->loop_detector_is_enabled())
+          landmark_rgb_(cfg->yaml_node_["PangolinViewer.landmark_rgb"].as<bool>(false))
+        //   mapping_mode_(system->mapping_module_is_enabled()),
+        //   loop_detection_mode_(system->loop_detector_is_enabled())
     {
         
     }
@@ -182,8 +182,8 @@ namespace pangolin_viewer
         menu_show_lms_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Show Landmarks", true, true));
         menu_show_local_map_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Show Local Map", true, true));
         menu_show_graph_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Show Graph", true, true));
-        menu_mapping_mode_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Mapping", mapping_mode_, true));
-        menu_loop_detection_mode_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Loop Detection", loop_detection_mode_, true));
+        // menu_mapping_mode_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Mapping", mapping_mode_, true));
+        // menu_loop_detection_mode_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Loop Detection", loop_detection_mode_, true));
         menu_pause_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Pause", false, true));
         menu_reset_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Reset", false, false));
         menu_terminate_ = std::unique_ptr<pangolin::Var<bool>>(new pangolin::Var<bool>("menu.Terminate", false, false));
@@ -567,32 +567,32 @@ namespace pangolin_viewer
         *menu_show_lms_ = true;
         *menu_show_local_map_ = true;
         *menu_show_graph_ = true;
-        *menu_mapping_mode_ = mapping_mode_;
-        *menu_loop_detection_mode_ = loop_detection_mode_;
+        // *menu_mapping_mode_ = mapping_mode_;
+        // *menu_loop_detection_mode_ = loop_detection_mode_;
 
         // reset menu button
         *menu_reset_ = false;
         *menu_terminate_ = false;
 
         // reset mapping mode
-        if (mapping_mode_)
-        {
-            system_->enable_mapping_module();
-        }
-        else
-        {
-            system_->disable_mapping_module();
-        }
+        // if (mapping_mode_)
+        // {
+        //     system_->enable_mapping_module();
+        // }
+        // else
+        // {
+        //     system_->disable_mapping_module();
+        // }
 
         // reset loop detector
-        if (loop_detection_mode_)
-        {
-            system_->enable_loop_detector();
-        }
-        else
-        {
-            system_->disable_loop_detector();
-        }
+        // if (loop_detection_mode_)
+        // {
+        //     system_->enable_loop_detector();
+        // }
+        // else
+        // {
+        //     system_->disable_loop_detector();
+        // }
 
         // reset internal state
         follow_camera_ = true;
@@ -614,28 +614,28 @@ namespace pangolin_viewer
         }
 
         // mapping module
-        if (*menu_mapping_mode_ && !mapping_mode_)
-        {
-            system_->enable_mapping_module();
-            mapping_mode_ = true;
-        }
-        else if (!*menu_mapping_mode_ && mapping_mode_)
-        {
-            system_->disable_mapping_module();
-            mapping_mode_ = false;
-        }
+        // if (*menu_mapping_mode_ && !mapping_mode_)
+        // {
+        //     system_->enable_mapping_module();
+        //     mapping_mode_ = true;
+        // }
+        // else if (!*menu_mapping_mode_ && mapping_mode_)
+        // {
+        //     system_->disable_mapping_module();
+        //     mapping_mode_ = false;
+        // }
 
         // loop detector
-        if (*menu_loop_detection_mode_ && !loop_detection_mode_)
-        {
-            system_->enable_loop_detector();
-            loop_detection_mode_ = true;
-        }
-        else if (!*menu_loop_detection_mode_ && loop_detection_mode_)
-        {
-            system_->disable_loop_detector();
-            loop_detection_mode_ = false;
-        }
+        // if (*menu_loop_detection_mode_ && !loop_detection_mode_)
+        // {
+        //     system_->enable_loop_detector();
+        //     loop_detection_mode_ = true;
+        // }
+        // else if (!*menu_loop_detection_mode_ && loop_detection_mode_)
+        // {
+        //     system_->disable_loop_detector();
+        //     loop_detection_mode_ = false;
+        // }
     }
 
     void viewer::request_terminate()

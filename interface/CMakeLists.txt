@@ -43,7 +43,7 @@ target_link_libraries(pysfm
 
 if(BUILD_PANGOLIN_VIEWER)
   target_compile_definitions(pysfm PUBLIC WITH_PANGOLIN_VIEWER)
-  target_link_libraries(pysfm PUBLIC pangolin_viewer)
+  target_link_libraries(pysfm PUBLIC pangolin_viewer ${Pangolin_LIBRARIES})
 endif()
 
 set_target_properties(pysfm PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${INTERFACE_OUTPUT_DIRECTORY})
