@@ -53,40 +53,36 @@ private:
 
 class Config {
 public:
-  // constructor from config file
-  Config(const std::string &config_file_path);
+  Config(const std::string& config_file_path,
+          const std::string & vocab_file_path,
+          const bool mapping = true,
+          const bool line_track = false,
+          const bool loop_detect = false,
+          const bool viewer = false,
+          const bool loadmap = false,
+          const bool serialize = false,
+          const std::string& map_db = "",
+          const std::string& scene_path = "",
+          const std::string& raw_img_dir = "");
 
-  // vocabulary path
-  Config& Vocab(const std::string& vocab_file_path);
+  // reset camera model  
+  Config& fitmodel(const int imwidth, const int imheight);
+
+  // vocab file
   std::string vocab_file_path_ = "";
-
-  // set camera model  
-  Config& Model(const int imwidth, const int imheight);
-
   // enable line
-  Config& LineTrack(bool flag = true);
   bool line_track_ = false;
-
   // mapping module
-  Config& Mapping(bool flag = true);
   bool mapping_ = true;
-
   // enable loopdetect
-  Config& LoopDetect(bool flag = true);
   bool loop_detect_ = false;
-
   // load map database
-  Config& Database(const std::string& map);
   bool preload = false;
   std::string map_db_path_ = "";
-
-  Config& Viewer(bool flag = true);
-  bool backview_ = false;
-
+  // pangolin viewer
+  bool viewer_ = false;
   // serialize for scene generation
-  Config& Serialize(const std::string& map, const std::string& scene, const std::string& raw_img);
   bool serialize_ = false;
-  std::string map_path_ = "";
   std::string scene_path_ = "";
   std::string raw_image_path_ = "";
 
@@ -158,15 +154,32 @@ PYBIND11_MODULE(pysfm, m) {
   m.doc() = "PLSLAM system wrapper modified from ORB-SLAM2 ";
 
   py::class_<Config>(m, "Config")
-    .def(py::init<std::string>(), py::arg("config_file_path"))
-    .def("vocab", &Config::Vocab, py::arg("path"))
-    .def("reset_model", &Config::Model, py::arg("imwidth"), py::arg("imheight"))
-    .def("line_track", &Config::LineTrack, py::arg("flag") = true)
-    .def("mapping", &Config::Mapping, py::arg("flag") = true)
-    .def("loopclose", &Config::LoopDetect, py::arg("flag") = true)
-    .def("database", &Config::Database, py::arg("map_path"))
-    .def("serialize", &Config::Serialize, py::arg("map_path"), py::arg("scene_path"), py::arg("raw_img_dir"))
-    .def("visualize", &Config::Viewer, py::arg("flag") = true);
+    .def(py::init<
+        const std::string&, 
+        const std::string&, 
+        const bool, 
+        const bool, 
+        const bool, 
+        const bool, 
+        const bool, 
+        const bool,
+        const std::string&, 
+        const std::string&, 
+        const std::string&
+      >(), 
+      py::arg("config_file_path"), 
+      py::arg("vocab_file_path"), 
+      py::arg("mapping") = true, 
+      py::arg("line_track") = false, 
+      py::arg("loop_detect") = false, 
+      py::arg("viewer") = false, 
+      py::arg("loadmap") = false,
+      py::arg("serialize") = false, 
+      py::arg("map_db") = "", 
+      py::arg("scene_path") = "", 
+      py::arg("raw_img_dir") = ""
+    )
+    .def("fitmodel", &Config::fitmodel, py::arg("imwidth"), py::arg("imheight"));
 
   py::class_<Session>(m, "Session")
     .def(py::init<Config, bool>(), py::arg("config"), py::arg("sync") = false)

@@ -66,19 +66,41 @@ void ImageStream::release() {
 /************************************
  * Pybind interface for config
  ************************************/
-Config::Config(const std::string& config_file_path)
+Config::Config(
+    const std::string& config_file_path,
+    const std::string & vocab_file_path,
+    const bool mapping,
+    const bool line_track,
+    const bool loop_detect,
+    const bool viewer,
+    const bool loadmap,
+    const bool serialize,
+    const std::string& map_db,
+    const std::string& scene_path,
+    const std::string& raw_img_dir
+) : vocab_file_path_(vocab_file_path),
+    line_track_(line_track),
+    mapping_(mapping),
+    loop_detect_(loop_detect),
+    viewer_(viewer),
+    map_db_path_(map_db),
+    scene_path_(scene_path),
+    raw_image_path_(raw_img_dir),
+    serialize_(serialize),
+    preload(loadmap)
 {
-  // constructor
-  yaml_node_ = YAML::LoadFile(config_file_path);
-  config_file_path_ = config_file_path;
+  yaml_node_ = YAML::LoadFile(config_file_path_);
+  if(raw_image_path_.back() != '/') raw_image_path_.append("/");
+  if(viewer_) {
+    #ifndef WITH_PANGOLIN_VIEWER
+      spdlog::critical("No pangolin support. Build with -DBUILD_PANGOLIN_VIEWER=ON");
+      exit(-1);
+    #endif
+  }
+  
 }
 
-Config& Config::Vocab(const std::string& voc_path) {
-  vocab_file_path_ = voc_path;
-  return *this;
-}
-
-Config& Config::Model(const int imwidth, const int imheight) {
+Config& Config::fitmodel(const int imwidth, const int imheight) {
   // set model
   yaml_node_["Camera.setup"] = "monocular";
   yaml_node_["Camera.model"] = "perspective";
@@ -99,36 +121,6 @@ Config& Config::Model(const int imwidth, const int imheight) {
   return *this;
 }
 
-Config& Config::LineTrack(bool flag) {
-  line_track_ = flag;
-  return *this;
-}
-
-Config& Config::Mapping(bool flag) {
-  mapping_ = flag;
-  return *this;
-}
-
-Config& Config::LoopDetect(bool flag) {
-  loop_detect_ = flag;
-  return *this;
-}
-
-Config& Config::Database(const std::string& map) {
-  preload = true;
-  map_db_path_ = map;
-  return *this;
-}
-
-Config& Config::Serialize(const std::string& map, const std::string& scene, const std::string& raw_img) {
-  serialize_ = true;
-  map_path_ = map;
-  scene_path_ = scene;
-  raw_image_path_ = raw_img;
-  if(raw_image_path_.back() != '/') raw_image_path_.append("/");
-  return *this;
-}
-
 std::shared_ptr<PLSLAM::config> Config::instance() {
   if(pconfig_ != nullptr) return pconfig_;
   else {
@@ -137,18 +129,6 @@ std::shared_ptr<PLSLAM::config> Config::instance() {
     );
     return pconfig_;
   }
-}
-
-Config& Config::Viewer(bool flag) {
-
-#ifdef WITH_PANGOLIN_VIEWER
-  backview_ = flag;
-#else
-  spdlog::critical("No pangolin support. Build with -DBUILD_PANGOLIN_VIEWER=ON");
-  exit(-1);
-#endif
-
-  return *this;
 }
 
 
@@ -185,7 +165,7 @@ Session::Session(const Config& cfg, bool sync)
   system_thread_ = std::thread(&Session::run, this);
 
 #ifdef WITH_PANGOLIN_VIEWER
-  if(cfg_.backview_) {
+  if(cfg_.viewer_) {
     pviewer_.reset(new pangolin_viewer::viewer(cfg_.instance(), psystem_.get(), psystem_->get_frame_publisher(), psystem_->get_map_publisher()));
     viewer_thread_ = std::thread(&pangolin_viewer::viewer::run, pviewer_.get());
   }
@@ -283,7 +263,7 @@ py::array_t<size_t> Session::release() {
   exit_required_ = true;
 
 #ifdef WITH_PANGOLIN_VIEWER
-  if(cfg_.backview_) {
+  if(cfg_.viewer_) {
     pviewer_->request_terminate();
     viewer_thread_.join();
   }
@@ -296,7 +276,7 @@ py::array_t<size_t> Session::release() {
   
   if(cfg_.serialize_) {
     // save map
-    psystem_->save_map_database(cfg_.map_path_);
+    psystem_->save_map_database(cfg_.map_db_path_);
     // save scene
     // dumpImages();
     pmvs_->serialize(cfg_.scene_path_, cfg_.raw_image_path_);

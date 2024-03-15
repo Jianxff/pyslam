@@ -47,35 +47,36 @@ void Scene::serialize(const std::string& filename, const std::string& image_dir)
   // serialize
   bool res = _INTERFACE_NAMESPACE::ARCHIVE::SerializeSave(scene_, filename);
 
-  if(res) spdlog::info("MVS: scene serialized to {}", filename);
-  else    spdlog::error("MVS: scene serialization failed");
+  if(res) spdlog::info("mvs scene serialized to {}", filename);
+  else    spdlog::error("mvs scene serialization failed");
 }
 
-  uint32_t Scene::getMaxDefinition(const std::vector<PLSLAM::data::keyframe*>& keyframes, uint32_t start, uint32_t end) {
-    if(end == -1) {
-      end = keyframes.size();
-    }
-    uint32_t argmax = start;
-    double max_mean_value = 0;
-
-    for(auto i = start; i < end; i++) {
-      auto& kf = keyframes[i];
-      if(!kf) continue;
-      cv::Mat img = kf->get_img_rgb();
-      if(img.empty()) continue;
-      cv::Mat gray, laplacian;
-      cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
-      cv::Laplacian(gray, laplacian, CV_64F);
-      double mean_value = cv::mean(laplacian)[0];
-
-      if(mean_value > max_mean_value) {
-        max_mean_value = mean_value;
-        argmax = i;
-      }
-    }
-
-    return argmax;
+uint32_t Scene::getMaxDefinition(const std::vector<PLSLAM::data::keyframe*>& keyframes, uint32_t start, uint32_t end) {
+  if(end == -1 || end > keyframes.size()) {
+    end = keyframes.size();
   }
+
+  uint32_t argmax = start;
+  double max_mean_value = 0;
+
+  for(auto i = start; i < end; i++) {
+    auto& kf = keyframes[i];
+    if(!kf) continue;
+    cv::Mat img = kf->get_img_rgb();
+    if(img.empty()) continue;
+    cv::Mat gray, laplacian;
+    cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
+    cv::Laplacian(gray, laplacian, CV_64F);
+    double mean_value = cv::mean(laplacian)[0];
+
+    if(mean_value > max_mean_value) {
+      max_mean_value = mean_value;
+      argmax = i;
+    }
+  }
+
+  return argmax;
+}
 
 
 void Scene::filterKeyframes() {
