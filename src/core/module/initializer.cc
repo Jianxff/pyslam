@@ -241,6 +241,7 @@ namespace PLSLAM
             }
 
             // create initial keyframes
+            data::keyframe::next_id_ = 0;
             auto init_keyfrm = new data::keyframe(init_frm_, map_db_, bow_db_);
             auto curr_keyfrm = new data::keyframe(curr_frm, map_db_, bow_db_);
 
@@ -382,6 +383,7 @@ namespace PLSLAM
 
             // create an initial keyframe
             curr_frm.set_cam_pose(Mat44_t::Identity());
+            data::keyframe::next_id_ = 0;
             auto curr_keyfrm = new data::keyframe(curr_frm, map_db_, bow_db_);
 
             // FW:

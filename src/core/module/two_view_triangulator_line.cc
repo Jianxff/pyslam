@@ -54,6 +54,10 @@ namespace PLSLAM
             // get 2D line segments and function (parameters)
             cv::line_descriptor::KeyLine keyline1 = keyfrm_1_->_keylsd[idx_1];
             cv::line_descriptor::KeyLine keyline2 = keyfrm_2_->_keylsd[idx_2];
+            if(idx_1 >= keyfrm_1_->_keyline_functions.size() || idx_2 >= keyfrm_2_->_keyline_functions.size())
+            {
+                return false;
+            }
             Vec3_t keyline1_function = keyfrm_1_->_keyline_functions[idx_1];
             Vec3_t keyline2_function = keyfrm_2_->_keyline_functions[idx_2];
 

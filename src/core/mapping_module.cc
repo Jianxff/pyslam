@@ -191,7 +191,6 @@ namespace PLSLAM
             cur_keyfrm_ = keyfrms_queue_.front();
             keyfrms_queue_.pop_front();
         }
-
         // set the origin keyframe
         local_map_cleaner_->set_origin_keyframe_id(map_db_->origin_keyfrm_->id_);
 
