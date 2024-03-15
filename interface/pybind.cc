@@ -110,8 +110,8 @@ Config& Config::fitmodel(const int imwidth, const int imheight) {
   yaml_node_["Camera.cols"] = imwidth;
   yaml_node_["Camera.rows"] = imheight;
   // set intrinsics
-  yaml_node_["Camera.fx"] = (double)(imheight > imwidth ? imwidth : imheight);
-  yaml_node_["Camera.fy"] = (double)(imheight > imwidth ? imwidth : imheight);
+  yaml_node_["Camera.fx"] = (double)(imheight > imwidth ? imheight : imwidth);
+  yaml_node_["Camera.fy"] = (double)(imheight > imwidth ? imheight : imwidth);
   yaml_node_["Camera.cx"] = (double)imwidth / 2.0;
   yaml_node_["Camera.cy"] = (double)imheight / 2.0;
   yaml_node_["Camera.k1"] = 0;
@@ -149,14 +149,14 @@ Session::Session(const Config& cfg, bool sync)
 
   // preload
   if(cfg_.preload)
-    psystem_->load_map_database(cfg.map_db_path_);
+    psystem_->load_map_database(cfg_.map_db_path_);
   if(cfg_.loop_detect_)
     psystem_->enable_loop_detector();
   // start session
-  psystem_->startup(!cfg.preload);
+  psystem_->startup(!cfg_.preload);
 
   // mapping
-  if(cfg.mapping_) psystem_->enable_mapping_module();
+  if(cfg_.mapping_) psystem_->enable_mapping_module();
   else psystem_->disable_mapping_module();
 
   // serialize
