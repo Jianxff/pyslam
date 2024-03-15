@@ -78,7 +78,8 @@ Config::Config(
     const std::string& map_db,
     const std::string& scene_path,
     const std::string& raw_img_dir
-) : vocab_file_path_(vocab_file_path),
+) : config_file_path_(config_file_path),
+    vocab_file_path_(vocab_file_path),
     line_track_(line_track),
     mapping_(mapping),
     loop_detect_(loop_detect),

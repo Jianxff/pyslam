@@ -950,6 +950,9 @@ namespace PLSLAM
             if(_img_rgb.empty() || _img_rgb.channels() != 3) {
                 return cv::Vec3b(0,0,0);
             }
+            if(kp.pt.x < 0 || kp.pt.x >= _img_rgb.cols || kp.pt.y < 0 || kp.pt.y >= _img_rgb.rows) {
+                return cv::Vec3b(0,0,0);
+            }
             return _img_rgb.at<cv::Vec3b>(kp.pt.y, kp.pt.x);
         }
 
