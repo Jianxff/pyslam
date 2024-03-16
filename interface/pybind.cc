@@ -216,6 +216,18 @@ py::array_t<size_t> Session::getTrackingState() {
   return py::array_t<size_t>({3}, data);
 }
 
+// get tracking visualize
+py::array_t<uint8_t> Session::getTrackingVisualize() {
+  if(released_) 
+    return py::array_t<uint8_t>();
+
+  cv::Mat img = psystem_->frame_publisher_->draw_frame(false);
+  if(img.empty()) return py::array_t<uint8_t>();
+
+  // cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+  return py::array_t<uint8_t>({img.rows, img.cols, 3}, img.data);
+}
+
 // get camera twc
 Eigen::Matrix4d Session::getTwc() {
   if(released_) return Eigen::Matrix4d::Identity();

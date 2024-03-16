@@ -17,6 +17,7 @@
 
 #include "core/system.h"
 #include "core/tracking_module.h"
+#include "core/publish/frame_publisher.h"
 #include "core/data/map_database.h"
 #include "core/config.h"
 
@@ -108,6 +109,8 @@ public:
   py::array_t<float> getFeaturePoints();
   // get tracking status
   py::array_t<size_t> getTrackingState();
+  // get tracking visualize
+  py::array_t<uint8_t> getTrackingVisualize();
   // get camera twc
   Eigen::Matrix4d getTwc();
   // get camera twc under openGL coordinate
@@ -189,6 +192,7 @@ PYBIND11_MODULE(pysfm, m) {
     .def("get_position_cv", &Session::getTwc)
     .def("get_position_gl", &Session::getTwcGL)
     .def("get_position_three", &Session::getTwcThree)
+    .def("get_tracking_visualize", &Session::getTrackingVisualize)
     .def("get_map_protobuf", &Session::getMapProtoBuf)
     .def("release", &Session::release)
     .def("cancel", &Session::cancel);

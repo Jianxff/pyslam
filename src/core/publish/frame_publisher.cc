@@ -189,13 +189,13 @@ namespace PLSLAM
 
                 if (mapping_is_enabled)
                 {
-                    cv::rectangle(img, pt_begin, pt_end, mapping_color_);
-                    cv::circle(img, curr_keypts.at(i).pt * mag, 2, mapping_color_, -1);
+                    // cv::rectangle(img, pt_begin, pt_end, mapping_color_);
+                    cv::circle(img, curr_keypts.at(i).pt * mag, 3, mapping_color_, -1);
                 }
                 else
                 {
-                    cv::rectangle(img, pt_begin, pt_end, localization_color_);
-                    cv::circle(img, curr_keypts.at(i).pt * mag, 2, localization_color_, -1);
+                    // cv::rectangle(img, pt_begin, pt_end, localization_color_);
+                    cv::circle(img, curr_keypts.at(i).pt * mag, 3, localization_color_, -1);
                 }
 
                 ++num_tracked;
@@ -304,7 +304,8 @@ namespace PLSLAM
         {
             std::lock_guard<std::mutex> lock(mtx_);
 
-            tracker->img_gray_.copyTo(img_);
+            tracker->img_rgb_.copyTo(img_);
+            cv::cvtColor(img_, img_, cv::COLOR_RGB2BGR);
 
             const auto num_curr_keypts = tracker->curr_frm_.num_keypts_;
             curr_keypts_ = tracker->curr_frm_.keypts_;

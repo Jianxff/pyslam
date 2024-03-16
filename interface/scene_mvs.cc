@@ -21,7 +21,7 @@ const Eigen::Matrix3d MAT_X33D_CV2GL_ =
 const Eigen::Matrix3d MAT_X33D_CV2GL_INVERSE_
    = MAT_X33D_CV2GL_;
 
-const unsigned int KEYFRAME_STEP_BY = 50;
+const unsigned int KEYFRAME_LIMIT = 800;
 
 
 Scene::Scene(const std::shared_ptr<PLSLAM::system>& psystem) 
@@ -34,14 +34,19 @@ void Scene::serialize(const std::string& filename, const std::string& image_dir)
   // set convert flag
   convert_cv2gl_ = true;
   // filter keyframes
+  spdlog::info("filtering keyframes");
   filterKeyframes();
   // bind keyframe id
+  spdlog::info("binding keyframe id");
   bindKeyframeID();
   // set platform
+  spdlog::info("defining platform");
   definePlatform();
   // set image and pose
+  spdlog::info("defining image and pose");
   defineImagePose(image_dir);
   // set map point
+  spdlog::info("defining structure"); 
   defineStructure();
 
   // serialize
@@ -99,12 +104,13 @@ void Scene::filterKeyframes() {
 
   // downsample
   auto kf_size = keyframes_filter.size();
-  int step = kf_size / KEYFRAME_STEP_BY;
-  step = (step == 0 ? 1 : step);
+  // int step = kf_size / KEYFRAME_LIMIT;
+  // step = (step == 0 ? 1 : step);
+  int step = 1;
   for(int i = 0; i < kf_size; i += step) {
     // find max definition from each step
-    const uint32_t arg = getMaxDefinition(keyframes_filter, i, i + step);
-    keyframes_.push_back(keyframes_filter[arg]);
+    // const uint32_t arg = getMaxDefinition(keyframes_filter, i, i + step);
+    keyframes_.push_back(keyframes_filter[i]);
   }
 }
 

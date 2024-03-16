@@ -135,6 +135,7 @@ namespace PLSLAM
 
         // color conversion
         img_gray_ = img;
+        img_rgb_ = img.clone();
         util::convert_to_grayscale(img_gray_, camera_->color_order_);
 
         // create current frame object

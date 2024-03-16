@@ -100,8 +100,8 @@ namespace PLSLAM
                                 const double elapsed_ms, const bool mapping_is_enabled) const;
 
             // colors (BGR)
-            const cv::Scalar mapping_color_{0, 255, 255};
-            const cv::Scalar localization_color_{255, 255, 0};
+            const cv::Scalar mapping_color_{0, 255, 0};
+            const cv::Scalar localization_color_{0, 255, 255};
 
             //! config
             std::shared_ptr<config> cfg_;

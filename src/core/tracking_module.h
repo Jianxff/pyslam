@@ -154,6 +154,7 @@ namespace PLSLAM
         data::frame curr_frm_;
         //! image of the current frame
         cv::Mat img_gray_;
+        cv::Mat img_rgb_;
 
         //! elapsed microseconds for each tracking
         double elapsed_ms_ = 0.0;
