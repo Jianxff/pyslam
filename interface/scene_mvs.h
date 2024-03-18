@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <filesystem>
 
 #include "interface_mvs.h"
 #include "core/system.h"
@@ -16,7 +17,7 @@ public:
   // constructor
   Scene(const std::shared_ptr<PLSLAM::system>&);
   // serialize
-  void serialize(const std::string& filename, const std::string& image_dir);
+  void serialize(const std::string& work_dir);
 
 protected:
   // filter keyframes

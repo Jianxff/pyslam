@@ -30,7 +30,11 @@ Scene::Scene(const std::shared_ptr<PLSLAM::system>& psystem)
   // initialize  
 }
 
-void Scene::serialize(const std::string& filename, const std::string& image_dir) {
+void Scene::serialize(const std::string& work_dir) {
+  std::string base_dir = work_dir;
+  if(base_dir.back() != '/')  base_dir += "/";
+  std::filesystem::create_directories(base_dir + "scene/");
+
   // set convert flag
   convert_cv2gl_ = true;
   // filter keyframes
@@ -44,15 +48,16 @@ void Scene::serialize(const std::string& filename, const std::string& image_dir)
   definePlatform();
   // set image and pose
   spdlog::info("defining image and pose");
-  defineImagePose(image_dir);
+  defineImagePose(base_dir + "images/");
   // set map point
   spdlog::info("defining structure"); 
   defineStructure();
 
   // serialize
-  bool res = _INTERFACE_NAMESPACE::ARCHIVE::SerializeSave(scene_, filename);
+  std::string filepath = base_dir + "scene/scene.mvs";
+  bool res = _INTERFACE_NAMESPACE::ARCHIVE::SerializeSave(scene_, filepath);
 
-  if(res) spdlog::info("mvs scene serialized to {}", filename);
+  if(res) spdlog::info("mvs scene serialized to {}", filepath);
   else    spdlog::error("mvs scene serialization failed");
 }
 
@@ -168,10 +173,13 @@ void Scene::defineImagePose(const std::string& image_dir) {
     _INTERFACE_NAMESPACE::Interface::Image image;
     // image source
     image.ID = getBindedID(kf->id_);
-    image.name = image_dir + std::to_string(kf->id_) + ".png";
+    image.name = "../../images/" + std::to_string(kf->id_) + ".png";
+    
     cv::Mat img = kf->get_img_rgb();
     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-    cv::imwrite(image.name, img);
+
+    const std::string filepath = image_dir + std::to_string(kf->id_) + ".png";
+    cv::imwrite(filepath, img);
 
     // camera
     image.platformID = 0;

@@ -19,6 +19,7 @@ pybind11_add_module(pysfm
     ${CMAKE_CURRENT_SOURCE_DIR}/pybind.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pybind.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/pcl_serializer.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/format_colmap.cc
     ${MAP_PB_SOURCE}
 )
 
