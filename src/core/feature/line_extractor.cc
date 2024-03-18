@@ -22,6 +22,7 @@
  */
 
 #include "core/feature/line_extractor.h"
+#include <opencv2/imgproc/imgproc_c.h>
 
 namespace PLSLAM
 {

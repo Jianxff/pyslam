@@ -19,6 +19,7 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/src/
         ${PROJECT_SOURCE_DIR}/3rd/json/include/
         ${PROJECT_SOURCE_DIR}/3rd/spdlog/include/
+        ${SUITESPARSE_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} 
@@ -27,7 +28,6 @@ target_link_libraries(${PROJECT_NAME}
         yaml-cpp
         Eigen3::Eigen
         ${OpenCV_LIBS}
-        ${CXSPARSE_LIBRARIES}
         ${SUITESPARSE_LIBRARIES}
         ${fbow_LIBS}
         g2o::core

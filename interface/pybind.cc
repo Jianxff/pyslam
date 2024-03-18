@@ -198,9 +198,6 @@ Session::Session(const Config& cfg, bool sync)
     if(cfg_.mapping_) psystem_->enable_mapping_module();
     else psystem_->disable_mapping_module();
 
-    // serialize
-    pserializer_.reset(new pcl_serializer(psystem_->map_publisher_));
-
     // run thread
     system_thread_ = std::thread(&Session::run, this);
 
@@ -288,23 +285,6 @@ Eigen::Matrix4d Session::getTwcThree(){
     return Twc;
 }
 
-std::string Session::getMapProtoBuf() {
-    if(released_) return "";
-    return pserializer_->serialize_map_diff();
-}
-
-// dump images
-void Session::dumpImages() {
-//   auto keyframes = psystem_->map_db_->get_all_keyframes();
-//   for(auto& kf : keyframes) {
-//     cv::Mat img = kf->get_img_rgb();
-//     if(img.empty()) continue;
-//     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
-//     std::string filename = cfg_.raw_image_path_ + std::to_string(kf->id_) + ".png";
-//     cv::imwrite(filename, img);
-//   }
-}
-
 // stop session
 py::array_t<size_t> Session::release() {
     size_t data[2] = {0,0};
@@ -344,7 +324,6 @@ py::array_t<size_t> Session::release() {
 
     // reset
     psystem_.reset();
-    pserializer_.reset();
     pstream_.reset();
     pmvs_.reset();
     pcolmap_.reset();

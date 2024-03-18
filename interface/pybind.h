@@ -23,7 +23,6 @@
 
 #include "scene_mvs.h"
 #include "format_colmap.h"
-#include "pcl_serializer.h"
 
 #ifdef WITH_PANGOLIN_VIEWER
 #include "pangolin_viewer/viewer.h"
@@ -127,8 +126,6 @@ public:
   Eigen::Matrix4d getTwcGL();
   // get camear position on three
   Eigen::Matrix4d getTwcThree();
-  // get serialize data
-  std::string getMapProtoBuf();
   // stop session
   py::array_t<size_t> release();
   // cancel session
@@ -139,8 +136,6 @@ private:
   void run();
   // get image from webrtc frame
   cv::Mat getImageRGB(py::array_t<uint8_t>& input);
-  // dump image
-  void dumpImages();
 
   std::atomic<bool> released_ = false;
   std::atomic<bool> exit_required_ = false;
@@ -152,7 +147,6 @@ private:
   std::shared_ptr<ImageStream> pstream_ = nullptr;
   std::shared_ptr<MVS::Scene> pmvs_ = nullptr;
   std::shared_ptr<Colmap::Sparse> pcolmap_ = nullptr;
-  std::unique_ptr<pcl_serializer> pserializer_ = nullptr;
 
   std::thread system_thread_;
 
@@ -213,7 +207,6 @@ PYBIND11_MODULE(pysfm, m) {
     .def("get_position_gl", &Session::getTwcGL)
     .def("get_position_three", &Session::getTwcThree)
     .def("get_tracking_visualize", &Session::getTrackingVisualize)
-    .def("get_map_protobuf", &Session::getMapProtoBuf)
     .def("release", &Session::release)
     .def("cancel", &Session::cancel);
 }

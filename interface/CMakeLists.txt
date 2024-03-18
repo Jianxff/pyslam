@@ -1,24 +1,17 @@
 ##########################
-# protobuf generate
-##########################
-find_package(Protobuf REQUIRED)
-
-set(PROTOBUF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate_cpp(MAP_PB_SOURCE MAP_PB_HEADER protobuf/pointcloud.proto)
-set_source_files_properties(${MAP_PB_HEADER} ${MAP_PB_SOURCE}
-    COMPILE_FLAGS -Wno-unused-variable)
-
-##########################
 # pybind interface
 ##########################
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
+message(STATUS "Found python ${PYTHON_VERSION_STRING} at: ${PYTHON_EXECUTABLE}")
+message(STATUS "Python includes: ${PYTHON_INCLUDE_DIRS}")
+
 pybind11_add_module(pysfm
     ${CMAKE_CURRENT_SOURCE_DIR}/interface_mvs.h
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_mvs.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/pcl_serializer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_mvs.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/pybind.h
     ${CMAKE_CURRENT_SOURCE_DIR}/pybind.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/pcl_serializer.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/format_colmap.cc
     ${MAP_PB_SOURCE}
 )
@@ -28,8 +21,7 @@ target_include_directories(pysfm
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/3rd/spdlog/include/
     ${PROJECT_SOURCE_DIR}/3rd/pybind11/include/
-    ${PYTHON_INCLUDE_DIRECTORY}
-    ${PROTOBUF_INCLUDE_DIRS}
+    ${PYTHON_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -37,7 +29,6 @@ target_link_libraries(pysfm
   PUBLIC
     Eigen3::Eigen
     ${OpenCV_LIBS}
-    ${PROTOBUF_LIBRARIES}
   PRIVATE
     ${PROJECT_NAME}
 )

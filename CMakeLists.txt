@@ -59,8 +59,7 @@ endif()
 ##########################
 # set 3rd directory
 ##########################
-set(fbow_DIR ${PROJECT_SOURCE_DIR}/3rd/FBoW/install/share/cmake/fbow)
-
+set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/3rd/install)
 
 ##########################
 # find package
@@ -68,7 +67,7 @@ set(fbow_DIR ${PROJECT_SOURCE_DIR}/3rd/FBoW/install/share/cmake/fbow)
 find_package(Threads REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(fbow REQUIRED)
-find_package(OpenCV 3 REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(g2o REQUIRED 
   COMPONENTS
@@ -81,11 +80,11 @@ find_package(g2o REQUIRED
     g2o::solver_csparse
     g2o::csparse_extension
 )
-find_package(CXSparse)
-if(NOT CXSPARSE_FOUND)
-  find_package(SuiteSparse REQUIRED)
-endif()
+find_package(SuiteSparse REQUIRED)
 
+
+message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+message(STATUS "Found fbow: ${fbow_INCLUDE_DIRS}")
 
 ##########################
 # build library
@@ -100,27 +99,22 @@ add_subdirectory(src)
 # extend library
 ##########################
 set(BUILD_SOCKET_PUBLISHER OFF CACHE BOOL "Enable Socket Publisher")
-set(BUILD_PANGOLIN_VIEWER ON CACHE BOOL "Enable Pangolin Publisher")
+set(BUILD_PANGOLIN_VIEWER OFF CACHE BOOL "Enable Pangolin Publisher")
 
 
 ##########################
 # pybind11 interface
 ##########################
-set(BUILD_INTERFACE ON CACHE BOOL "Build Pybind Interface")
-if(BUILD_INTERFACE)
+set(BUILD_PYBIND ON CACHE BOOL "Build Pybind Interface")
+if(BUILD_PYBIND)
   message(STATUS "Build Pybind Interface")
 
-  set(PYTHON_INCLUDE_DIRECTORY ${PYTHON_DIR})
-  if(NOT PYTHON_INCLUDE_DIRECTORY)
-    set(PYTHON_INCLUDE_DIRECTORY /usr/include/python3.8/)
-  endif()
-
-  set(INTERFACE_OUTPUT_DIRECTORY ${PYTHON_LIB_DIR})
+  set(INTERFACE_OUTPUT_DIRECTORY ${PYBIND_MODULE_DIR})
   if(NOT INTERFACE_OUTPUT_DIRECTORY)
     set(INTERFACE_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
   endif()
   
-  message(STATUS "Interface output directory: ${INTERFACE_OUTPUT_DIRECTORY}")
+  message(STATUS "Pybind module directory: ${INTERFACE_OUTPUT_DIRECTORY}")
 
   add_subdirectory(${PROJECT_SOURCE_DIR}/3rd/pybind11)
   add_subdirectory(interface)
