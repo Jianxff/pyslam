@@ -175,7 +175,7 @@ void Scene::defineImagePose(const std::string& image_dir) {
     image.ID = getBindedID(kf->id_);
     image.name = "../../images/" + std::to_string(kf->id_) + ".png";
     
-    cv::Mat img = kf->get_img_rgb();
+    cv::Mat img = kf->get_img_rgb().clone();
     cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
 
     const std::string filepath = image_dir + std::to_string(kf->id_) + ".png";

@@ -133,7 +133,7 @@ void Sparse::serializeImages() {
         auto kf = ele.second;
         // write image
         const std::string image_name = std::to_string(kf->id_) + ".png";
-        cv::Mat img = kf->get_img_rgb();
+        cv::Mat img = kf->get_img_rgb().clone();
         cv::cvtColor(img, img, cv::COLOR_RGB2BGR);
         cv::imwrite(image_dir_ + image_name, img);
 
