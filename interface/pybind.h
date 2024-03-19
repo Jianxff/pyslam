@@ -158,8 +158,8 @@ private:
 };
 
 
-PYBIND11_MODULE(pysfm, m) {
-  m.doc() = "PLSLAM system wrapper modified from ORB-SLAM2 ";
+PYBIND11_MODULE(pyslam, m) {
+  m.doc() = "python SLAM wrapper modified from Structure-PLP-SLAM";
 
   py::class_<Config>(m, "Config")
     .def(py::init<
