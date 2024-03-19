@@ -6,7 +6,7 @@ find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT REQUIRED)
 message(STATUS "Found python ${PYTHON_VERSION_STRING} at: ${PYTHON_EXECUTABLE}")
 message(STATUS "Python includes: ${PYTHON_INCLUDE_DIRS}")
 
-pybind11_add_module(pysfm
+pybind11_add_module(pyslam
     ${CMAKE_CURRENT_SOURCE_DIR}/interface_mvs.h
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_mvs.h
     ${CMAKE_CURRENT_SOURCE_DIR}/scene_mvs.cc
@@ -16,7 +16,7 @@ pybind11_add_module(pysfm
     ${MAP_PB_SOURCE}
 )
 
-target_include_directories(pysfm
+target_include_directories(pyslam
   PUBLIC
     ${PROJECT_SOURCE_DIR}/src/
     ${PROJECT_SOURCE_DIR}/3rd/spdlog/include/
@@ -25,7 +25,7 @@ target_include_directories(pysfm
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(pysfm
+target_link_libraries(pyslam
   PUBLIC
     Eigen3::Eigen
     ${OpenCV_LIBS}
@@ -34,10 +34,10 @@ target_link_libraries(pysfm
 )
 
 if(BUILD_PANGOLIN_VIEWER)
-  target_compile_definitions(pysfm PUBLIC WITH_PANGOLIN_VIEWER)
-  target_link_libraries(pysfm PUBLIC pangolin_viewer ${Pangolin_LIBRARIES})
+  target_compile_definitions(pyslam PUBLIC WITH_PANGOLIN_VIEWER)
+  target_link_libraries(pyslam PUBLIC pangolin_viewer ${Pangolin_LIBRARIES})
 endif()
 
-set_target_properties(pysfm PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${INTERFACE_OUTPUT_DIRECTORY})
-set_target_properties(pysfm PROPERTIES OUTPUT_NAME "pysfm")
-set_target_properties(pysfm PROPERTIES SUFFIX ".so")
+set_target_properties(pyslam PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${INTERFACE_OUTPUT_DIRECTORY})
+set_target_properties(pyslam PROPERTIES OUTPUT_NAME "pyslam")
+set_target_properties(pyslam PROPERTIES SUFFIX ".so")
